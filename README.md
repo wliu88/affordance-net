@@ -29,14 +29,15 @@ By Thanh-Toan Do\*, Anh Nguyen\*, Ian Reid (\* equal contribution)
 
 
 ### Installation
+Because this package uses some self-defined caffe functions. Build the customized caffe from source.
 
 1. Clone the AffordanceNet repository into your `$AffordanceNet_ROOT` folder.
-	
-	
+		
 2. Build `Caffe` and `pycaffe`:
 	- `cd $AffordanceNet_ROOT/caffe-affordance-net`
-    - `# Now follow the Caffe installation instructions: http://caffe.berkeleyvision.org/installation.html`
-    - `# If you're experienced with Caffe and have all of the requirements installed and your Makefile.config in place, then simply do:`
+    - `# Now follow the Caffe installation instructions: http://caffe.berkeleyvision.org/installation.html to 
+       make sure you have all of the requirements installed and your Makefile.config in place, then simply do:`
+    - `possibly use a existing Makefile.config from /makefile_config_template` 
     - `make -j8 && make pycaffe`
      
 
@@ -93,6 +94,9 @@ After successfully completing installation, you'll be ready to run the demo.
 	- Format your images as in Pascal-VOC dataset (as in `$AffordanceNet_ROOT/data/VOCdevkit2012` folder).
 	- Prepare the affordance masks (as in `$AffordanceNet_ROOT/data/cache` folder): For each object in the image, we need to create a mask and save as a .sm file. See `$AffordanceNet_ROOT/utils` for details.
 
+### Debug
+1. If `ImportError: No module named Image` occurs when running demo, change import from `import Image` to `from PIL import Image` in
+`$AffordanceNet_ROOT/lib/fast_rcnn/test.py`
 
 ### Citing AffordanceNet
 
