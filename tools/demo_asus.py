@@ -27,8 +27,6 @@ rospy.init_node('AffordanceNet_Node')
 ic = ImageIO()
 pub_obj_pose_3D = rospy.Publisher("vs_obj_pose_3D", PoseStamped) # pose of object in camera frame
 
-
-
 CONF_THRESHOLD = 0.9
 good_range = 0.005
     
@@ -359,7 +357,7 @@ if __name__ == '__main__':
         rgb = ic.asus_rgb_img
         dep = ic.asus_dep_img
         
-        if (rgb != None and dep != None):
+        if rgb is not None and dep is not None:
             print 'rgb shape: ', rgb.shape
             h, w, c = rgb.shape
             

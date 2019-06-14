@@ -6,9 +6,9 @@ from cv_bridge import CvBridge, CvBridgeError
 class ImageIO:
     def __init__(self):
         self.bridge = CvBridge()
-        self.asus_rgb_sub = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.asus_rgb_callback)
-        self.asus_dep_sub = rospy.Subscriber("/camera/depth/image_rect", Image, self.asus_dep_callback)
-        self.asus_cam_sub = rospy.Subscriber("/camera/depth/camera_info", CameraInfo, self.asus_cam_callback) 
+        self.asus_rgb_sub = rospy.Subscriber("/head_camera/rgb/image_rect_color", Image, self.asus_rgb_callback)
+        self.asus_dep_sub = rospy.Subscriber("/head_camera/depth/image_rect", Image, self.asus_dep_callback)
+        self.asus_cam_sub = rospy.Subscriber("/head_camera/depth/camera_info", CameraInfo, self.asus_cam_callback)
         self.asus_rgb_img = None
         self.asus_dep_img = None
         
@@ -22,7 +22,7 @@ class ImageIO:
             
     def asus_rgb_callback(self, data):
         try:
-            self.asus_rgb_img = self.bridge.imgmsg_to_cv2(data, "bgr8")            
+            self.asus_rgb_img = self.bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError as e:
             print(e)
     
