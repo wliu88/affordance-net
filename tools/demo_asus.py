@@ -53,6 +53,7 @@ c10 = [184,0,141]
 c11 = [184,134,0] 
 c12 = [184,134,223]
 label_colours = np.array([background, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12])
+affordance_labels = ['background', 'contain', 'cut', 'display', 'engine', 'grasp', 'hit', 'pound', 'support', 'w-grasp']
 
 # Object
 col0 = [0, 0, 0]
@@ -69,7 +70,19 @@ col10 = [25, 25, 155]
 
 col_map = [col0, col1, col2, col3, col4, col5, col6, col7, col8, col9, col10]
 
+def show_color_legend():
+    # initialize the legend visualization
+    legend = np.zeros(((len(affordance_labels) * 25) + 25, 200, 3), dtype="uint8")
 
+    # loop over the class names + colors
+    for i, label in enumerate(affordance_labels):
+        # draw the class name + color on the legend
+        color = label_colours[i]
+        cv2.putText(legend, label, (5, (i * 25) + 17),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+        cv2.rectangle(legend, (100, (i * 25)), (200, (i * 25) + 25),
+                      tuple(color), -1)
+    return legend
 
 def reset_mask_ids(mask, before_uni_ids):
     # reset ID mask values from [0, 1, 4] to [0, 1, 2] to resize later 
@@ -243,6 +256,9 @@ def visualize_mask_asus(im, rois_final, rois_class_score, rois_class_ind, masks,
     cv2.imshow('Obj Detection', img_out)
     #cv2.imwrite('obj_detction.jpg', img_out)
     #cv2.waitKey(0)
+
+    legend = show_color_legend()
+    cv2.imshow('Legend', legend)
     
     return list_bboxes, list_masks
 
