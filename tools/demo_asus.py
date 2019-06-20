@@ -10,7 +10,8 @@ from fast_rcnn.nms_wrapper import nms
 from utils.timer import Timer
 
 import numpy as np
-import os, cv2
+import os
+import cv2
 import argparse
 import caffe
 
@@ -21,6 +22,7 @@ from geometry_msgs.msg import Pose, Point
 from geometry_msgs.msg import PoseStamped
 
 from ros_image_io import ImageIO
+
 
 # start ros node and imageio
 rospy.init_node('AffordanceNet_Node')
@@ -39,19 +41,19 @@ img_folder = cwd + '/img'
 OBJ_CLASSES = ('__background__', 'bowl', 'tvm', 'pan', 'hammer', 'knife', 'cup', 'drill', 'racket', 'spatula', 'bottle')
 
 # Mask
-background = [200, 222, 250]  
-c1 = [0,0,205]   
-c2 = [34,139,34] 
-c3 = [192,192,128]   
-c4 = [165,42,42]    
-c5 = [128,64,128]   
-c6 = [204,102,0]  
-c7 = [184,134,11] 
-c8 = [0,153,153]
-c9 = [0,134,141]
-c10 = [184,0,141] 
-c11 = [184,134,0] 
-c12 = [184,134,223]
+background = [200, 222, 250]
+c1 = [0, 0, 205]
+c2 = [34, 139, 34]
+c3 = [192, 192, 128]
+c4 = [165, 42, 42]
+c5 = [128, 64, 128]
+c6 = [204, 102, 0]
+c7 = [184, 134, 11]
+c8 = [0, 153, 153]
+c9 = [0, 134, 141]
+c10 = [184, 0, 141]
+c11 = [184, 134, 0]
+c12 = [184, 134, 223]
 label_colours = np.array([background, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12])
 affordance_labels = ['background', 'contain', 'cut', 'display', 'engine', 'grasp', 'hit', 'pound', 'support', 'w-grasp']
 
@@ -84,6 +86,7 @@ def show_color_legend():
                       tuple(color), -1)
     return legend
 
+
 def reset_mask_ids(mask, before_uni_ids):
     # reset ID mask values from [0, 1, 4] to [0, 1, 2] to resize later 
     counter = 0
@@ -92,9 +95,8 @@ def reset_mask_ids(mask, before_uni_ids):
         counter += 1
         
     return mask
-    
 
-    
+
 def convert_mask_to_original_ids_manual(mask, original_uni_ids):
     #TODO: speed up!!!
     temp_mask = np.copy(mask) # create temp mask to do np.around()
@@ -118,8 +120,6 @@ def convert_mask_to_original_ids_manual(mask, original_uni_ids):
     return out_mask
         
 
-
-
 def draw_arrow(image, p, q, color, arrow_magnitude, thickness, line_type, shift):
     # draw arrow tail
     cv2.line(image, p, q, color, thickness, line_type, shift)
@@ -135,7 +135,8 @@ def draw_arrow(image, p, q, color, arrow_magnitude, thickness, line_type, shift)
     int(q[1] + arrow_magnitude * np.sin(angle - np.pi/4)))
     # draw second half of arrow head
     cv2.line(image, p, q, color, thickness, line_type, shift)
-    
+
+
 def draw_reg_text(img, obj_info):
     #print 'tbd'
     
@@ -164,7 +165,6 @@ def draw_reg_text(img, obj_info):
     return img
 
 
-
 def visualize_mask_asus(im, rois_final, rois_class_score, rois_class_ind, masks, thresh):
 
     list_bboxes = []
@@ -183,8 +183,8 @@ def visualize_mask_asus(im, rois_final, rois_class_score, rois_class_ind, masks,
             return list_bboxes, list_masks
             
     rois_final = rois_final[inds, :]
-    rois_class_score = rois_class_score[inds,:]
-    rois_class_ind = rois_class_ind[inds,:]
+    rois_class_score = rois_class_score[inds, :]
+    rois_class_ind = rois_class_ind[inds, :]
     
     # get mask
     masks = masks[inds, :, :, :]
@@ -192,7 +192,7 @@ def visualize_mask_asus(im, rois_final, rois_class_score, rois_class_ind, masks,
     im_width = im.shape[1]
     im_height = im.shape[0]
     
-    # transpose
+    # transpose BGR channel back to RGB
     im = im[:, :, (2, 1, 0)]
 
     num_boxes = rois_final.shape[0]
@@ -201,10 +201,10 @@ def visualize_mask_asus(im, rois_final, rois_class_score, rois_class_ind, masks,
         
         curr_mask = np.full((im_height, im_width), 0.0, 'float') # convert to int later
             
-        class_id = int(rois_class_ind[i,0])
+        class_id = int(rois_class_ind[i, 0])
     
         bbox = rois_final[i, 1:5]
-        score = rois_class_score[i,0]
+        score = rois_class_score[i, 0]
         
         if cfg.TEST.MASK_REG:
 
@@ -217,7 +217,8 @@ def visualize_mask_asus(im, rois_final, rois_class_score, rois_class_ind, masks,
             y1 = np.min((im_height - 1, np.max((0, y1))))
             x2 = np.min((im_width - 1, np.max((0, x2))))
             y2 = np.min((im_height - 1, np.max((0, y2))))
-            
+
+            # bboxes format: class_id, probability, x1, y1, x2, y2
             cur_box = [class_id, score, x1, y1, x2, y2]
             list_bboxes.append(cur_box)
             
@@ -264,6 +265,13 @@ def visualize_mask_asus(im, rois_final, rois_class_score, rois_class_ind, masks,
 
 
 def get_list_centroid(current_mask, obj_id):
+    """
+    Get centroid of each segmented part
+
+    :param current_mask:
+    :param obj_id:
+    :return: a list of [obj_id, mask_id, x, y]
+    """
     list_uni_ids = list(np.unique(current_mask))
     list_uni_ids.remove(0) ## remove background id
     
@@ -279,9 +287,18 @@ def get_list_centroid(current_mask, obj_id):
         cur_centroid = [obj_id, val, xmean, ymean]
         list_centroid.append(cur_centroid)
         
-    return list_centroid   
+    return list_centroid
+
 
 def convert_bbox_to_centroid(list_boxes, list_masks):
+    """
+    Compute centroids of all segmented parts
+
+    :param list_boxes:
+    :param list_masks:
+    :return: a list of [obj_id, mask_id, x, y]
+    """
+
     assert len(list_boxes) == len(list_masks), 'ERROR: len(list_boxes) and len(list_masks) must be equal'
     list_final = []
     for i in range(len(list_boxes)):
@@ -315,6 +332,7 @@ def project_to_3D(width_x, height_y, depth, ic):
     
     return p3D
 
+
 def run_affordance_net_asus(net, im):
 
     # Detect all object classes and regress object bounds
@@ -329,7 +347,9 @@ def run_affordance_net_asus(net, im):
            '{:d} object proposals').format(timer.total_time, rois_final.shape[0])
     
     # Visualize detections for each class
-    return visualize_mask_asus(im, rois_final, rois_class_score, rois_class_ind, masks, thresh=CONF_THRESHOLD)
+    list_boxes, list_masks = visualize_mask_asus(im, rois_final, rois_class_score, rois_class_ind, masks,
+                                                 thresh=CONF_THRESHOLD)
+    return list_boxes, list_masks
 
 
 def parse_args():
@@ -339,18 +359,19 @@ def parse_args():
                         default=0, type=int)
     parser.add_argument('--cpu', dest='cpu_mode',
                         help='Use CPU mode (overrides --gpu)',
+                        # The store_true option automatically creates a default value of False
                         action='store_true')
 
     args = parser.parse_args()
 
     return args
 
+
 if __name__ == '__main__':
     cfg.TEST.HAS_RPN = True  # Use RPN for proposals
 
     args = parse_args()
-    
-    
+
     prototxt = root_path + '/models/pascal_voc/VGG16/faster_rcnn_end2end/test.prototxt'
     caffemodel = root_path + '/pretrained/AffordanceNet_200K.caffemodel'   
     
@@ -370,35 +391,37 @@ if __name__ == '__main__':
 
     while(1):
     
-        rgb = ic.asus_rgb_img
+        bgr = ic.asus_rgb_img
         dep = ic.asus_dep_img
         
-        if rgb is not None and dep is not None:
-            print 'rgb shape: ', rgb.shape
-            h, w, c = rgb.shape
+        if bgr is not None and dep is not None:
+            print 'rgb shape: ', bgr.shape
+            h, w, c = bgr.shape
             
-            if (h > 100 and w > 100):
+            if h > 100 and w > 100:
                 print '--------------------------------------------------------'
-                cv2.imshow('Input Image', rgb)     
+                cv2.imshow('Input Image', bgr)
                 cv2.waitKey(1)
-                
-                # run detection
-                list_boxes, list_masks = run_affordance_net_asus(net, rgb)
+
+                # 1. run detection and show image with bounding boxes, segmentation masks for each object
+                list_boxes, list_masks = run_affordance_net_asus(net, bgr)
                 print 'len list boxes: ', len(list_boxes)
                 if len(list_boxes) < 1:
                     continue ## no object found
-                
-                list_obj_centroids = convert_bbox_to_centroid(list_boxes, list_masks)
-                
+
+                # 2. project selected object affordance part to 3D
                 # select object and affordance to project to 3D
-                obj_id = 10 # bottle
+                obj_id = 10  # bottle
                 aff_id = 5  # grasp affordance
-            
-                selected_obj_aff = select_object_and_aff(list_obj_centroids, obj_id, aff_id) 
+
+                list_obj_centroids = convert_bbox_to_centroid(list_boxes, list_masks)
+
+                selected_obj_aff = select_object_and_aff(list_obj_centroids, obj_id, aff_id)
                 if len(selected_obj_aff) < 1:
                     continue
                 
-                # get depth value from depth map                        
+                # get depth value from depth map
+                # 3 is x, 2 is y
                 dval = dep[selected_obj_aff[3], selected_obj_aff[2]]
                 
                 if dval != 'nan':

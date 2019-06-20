@@ -22,6 +22,7 @@ class ImageIO:
             
     def asus_rgb_callback(self, data):
         try:
+            # bgr8 is the image encoding expected by most opencv function
             self.asus_rgb_img = self.bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError as e:
             print(e)
@@ -34,10 +35,10 @@ class ImageIO:
             print (e)
             
     def asus_cam_callback(self, cam_msg):
-        if (self.asus_K == None):
+        if self.asus_K is None:
             self.asus_K = cam_msg.K
-#             self.asus_K = [550.6944711701044, 0.0, 325.91239272527577, 0.0, 553.678494137733, 233.01009570210894, 0.0, 0.0, 1.0]
-#             self.asus_K = [537.719521812601, 0.0, 317.7514539076608, 0.0, 532.663175739311, 226.92788210884436, 0.0, 0.0, 1.0]
+            #self.asus_K = [550.6944711701044, 0.0, 325.91239272527577, 0.0, 553.678494137733, 233.01009570210894, 0.0, 0.0, 1.0]
+            #self.asus_K = [537.719521812601, 0.0, 317.7514539076608, 0.0, 532.663175739311, 226.92788210884436, 0.0, 0.0, 1.0]
             self.asus_fx = self.asus_K[0]
             self.asus_cx = self.asus_K[2]
             self.asus_fy = self.asus_K[4]
@@ -45,5 +46,5 @@ class ImageIO:
             self.asus_width = cam_msg.width
             self.asus_height = cam_msg.height            
         else:
+            # unsubscribe from the topic
             self.asus_cam_sub.unregister()
-            
