@@ -14,37 +14,41 @@ By Thanh-Toan Do\*, Anh Nguyen\*, Ian Reid (\* equal contribution)
 ### Requirements
 
 1. Caffe
-	- Install Caffe: [Caffe installation instructions](http://caffe.berkeleyvision.org/installation.html).
 	- Caffe must be built with support for Python layers.
 
 2. Hardware
 	- To train a full AffordanceNet, you'll need a GPU with ~11GB (e.g. Titan, K20, K40, Tesla, ...).
 	- To test a full AffordanceNet, you'll need ~6GB GPU.
 
-3. [Optional] For robotic demo
+3. [Optional] Robot Demo - This option is from the original repo. Since this repo is now used only as a submodule in the `rail_part_affordance_detection` repo, check out the main repo for more up-to-date robot demo.
 	- [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu)
 	- [rospy](http://wiki.ros.org/rospy)
 	- [OpenNI](https://github.com/OpenNI/OpenNI)
 	- [PrimeSensor](https://github.com/PrimeSense/Sensor)
 
+### Pre-installation Actions
+This package has been tested on Ubuntu 18.04 with CUDA 9.2 and CUDA 10.1. Installing these versions of CUDA should ensure successful installation. 
 
 ### Installation
-Because this package uses some self-defined caffe functions. Build the customized caffe from source.
+***Caffe needs to be built from source since this package uses customized caffe functions.***
 
-1. Clone the AffordanceNet repository into your `$AffordanceNet_ROOT` folder.
+1. Clone the AffordanceNet repository into your `$AffordanceNet_ROOT` folder if you haven't already done so. 
 		
-2. Build `Caffe` and `pycaffe`:
-	- `cd $AffordanceNet_ROOT/caffe-affordance-net`
-    - `# Now follow the Caffe installation instructions: http://caffe.berkeleyvision.org/installation.html to 
-       make sure you have all of the requirements installed and your Makefile.config in place, then simply do:`
-    - `possibly use a existing Makefile.config from /makefile_config_template` 
-    - `make -j8 && make pycaffe`
+2. Build `Caffe` and `pycaffe` from source:
+    - `cd $AffordanceNet_ROOT/caffe-affordance-net`
+    - Now follow the [Caffe installation instructions](http://caffe.berkeleyvision.org/installation.html) to 
+       make sure you have all of the requirements installed. 
+    	- Check out the step-by-step instructions for `Ubuntu installation` and make sure the dependencies under `General dependencies`, `BLAS`, and `Python` for `Ubuntu (< 17.04)` are installed. For `BLAS`, just use `ATLAS`. 
+        - Go back to the main page and follow the instructions to install necessary python packages using pip.
+    - Copy an existing Makefile.config from `$AffordanceNet_ROOT/caffe-affordance-net/makefile_config_template` to `$AffordanceNet_ROOT/caffe-affordance-net`
+    - `make -j8`
+    - If run into problems, this [webpage](https://github.com/BVLC/caffe/wiki/Commonly-encountered-build-issues) usually provides solutions. 
+    - `make pycaffe`
+    - `export PYTHONPATH=$AffordanceNet_ROOT/caffe-affordance-net/python:$PYTHONPATH`
      
-
 3. Build the Cython modules:
     - `cd $AffordanceNet_ROOT/lib`
     - `make`
-
 
 4. Download pretrained weights ([Google Drive](https://drive.google.com/file/d/0Bx3H_TbKFPCjNlMtSGJlQ0dxVzQ/view?usp=sharing), [One Drive](https://studenthcmusedu-my.sharepoint.com/:u:/g/personal/nqanh_mso_hcmus_edu_vn/ETD6q64-L1lCgtNEryA42NwBNM9vNoyE8QyxAYzgt8NqnA?e=uRCxPg)). This weight is trained on the training set of the [IIT-AFF dataset](https://sites.google.com/site/iitaffdataset/):
     - Extract the file you downloaded to `$AffordanceNet_ROOT`
@@ -54,9 +58,6 @@ Because this package uses some self-defined caffe functions. Build the customize
 ### Demo
 
 After successfully completing installation, you'll be ready to run the demo. 
-
-0. Export pycaffe path:
-	- `export PYTHONPATH=$AffordanceNet_ROOT/caffe-affordance-net/python:$PYTHONPATH`
 
 1. Demo on static images:
 	- `cd $AffordanceNet_ROOT/tools`
