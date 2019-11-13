@@ -1,5 +1,6 @@
-# this config file is used to install caffe on rail-doodlebug-bionic
-# ubuntu 18.04, cuda 9.2, nvidia-driver-396
+# this config file is used to install caffe on rail-doodlebug-bionic and Weiyu's lab computer.
+# Tested with ubuntu 18.04, cuda 9.2, nvidia-driver-396
+# Tested with ubuntu 18.04, cuda 10.1, nvidia-driver-418
 
 ## Refer to http://caffe.berkeleyvision.org/installation.html
 # Contributions simplifying and improving our build system are welcome!
