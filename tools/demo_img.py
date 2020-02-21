@@ -28,16 +28,16 @@ img_folder = cwd + '/img'
 OBJ_CLASSES = ('__background__', 'bowl', 'tvm', 'pan', 'hammer', 'knife', 'cup', 'drill', 'racket', 'spatula', 'bottle')
 
 # Mask
-background = [200, 222, 250]  
-c1 = [0,0,205]   
-c2 = [34,139,34] 
-c3 = [192,192,128]   
-c4 = [165,42,42]    
-c5 = [128,64,128]   
-c6 = [204,102,0]  
-c7 = [184,134,11] 
-c8 = [0,153,153]
-c9 = [0,134,141]
+background = [200, 222, 250]  # background
+c1 = [0,0,205]                # contain
+c2 = [34,139,34] 	          # cut
+c3 = [192,192,128]            # display
+c4 = [165,42,42]    	 	  # engine
+c5 = [128,64,128]   		  # grasp
+c6 = [204,102,0]  			  # hit
+c7 = [184,134,11] 			  # pound
+c8 = [0,153,153] 			  # support
+c9 = [0,134,141]			  # w-grasp
 c10 = [184,0,141] 
 c11 = [184,134,0] 
 c12 = [184,134,223]
