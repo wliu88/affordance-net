@@ -30,7 +30,7 @@ case $DATASET in
     TEST_IMDB="voc_2012_val"
     PT_DIR="pascal_voc"
     #ITERS=70000
-    ITERS=2000000
+    ITERS=10000
     ;;
   coco)
     # This is a very long and slow training schedule

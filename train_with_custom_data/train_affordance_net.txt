@@ -44,11 +44,20 @@ note: need gpu that has about 12GB RAM
 
 1. remove `.pkl` file in `data/cache`
 
-1. change prototxt to change numbers of object categories and affordance classes
+2.
+Modify `self._classes` in `lib/datasets/pascal_voc.py` to have correct object class labels
+
+3. change prototxt to change numbers of object categories and affordance classes
 at line 13, the num_classes is 11, and your comment is "10 obj categories + 1 background"
 at line 890, the num_output is 10, your comment is "9 affordance classes +1 backgtound"
 
 search for 11
 search for 10
+
+4. change epoches in
+`experiments/scripts/faster_rcnn_end2end.sh`
+
+
+
 
 
