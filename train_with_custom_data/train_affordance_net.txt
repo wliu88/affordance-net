@@ -11,6 +11,8 @@ right click can quickly save image
 
 LABELING
 ************************************************************************************
+notes: all file names only support numbers
+
 1. install labelme
 use python2.7 virtualenv
 git clone repo
