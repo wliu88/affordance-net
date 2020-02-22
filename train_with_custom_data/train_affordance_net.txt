@@ -1,0 +1,52 @@
+Look at the following issue pages for more details
+https://github.com/nqanh/affordance-net/issues/8
+https://github.com/nqanh/affordance-net/issues/7
+
+
+COLLECTING IMAGES
+************************************************************************************
+use ros package image_view
+right click can quickly save image
+
+
+LABELING
+************************************************************************************
+1. install labelme
+use python2.7 virtualenv
+git clone repo
+pip install .
+
+2. label class
+make object_classes.txt label txt file
+labelme ${img_folder} --labels ${object_classes.txt} --nodata --validatelabel exact --config '{shift_auto_shape_color: -2}'
+move json files out
+call json to xml
+
+check annotation_helper.bbox_json_to_xml()
+
+3. label affordance mask
+make affordance_labels.txt
+labelme ${img_folder} --labels ${affordance_labels.txt} --nodata --validatelabel exact --config '{shift_auto_shape_color: -2}'
+
+from bounding polygons to masks
+python labelme2voc.py ${img_folder} ${mask_folder} --labels ${affordance_labels.txt}
+
+check annotation_helper.mask_npy_to_sm()
+
+4. prepare train and test splits
+
+
+TRAINING
+************************************************************************************
+note: need gpu that has about 12GB RAM
+
+1. remove `.pkl` file in `data/cache`
+
+1. change prototxt to change numbers of object categories and affordance classes
+at line 13, the num_classes is 11, and your comment is "10 obj categories + 1 background"
+at line 890, the num_output is 10, your comment is "9 affordance classes +1 backgtound"
+
+search for 11
+search for 10
+
+
