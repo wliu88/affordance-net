@@ -19,7 +19,7 @@ def bbox_json_to_xml(taskname, input_dir, output_dir):
             with open(os.path.join(input_dir, filename), "r") as fh:
                 data = json.load(fh)
             x_min, y_min = data['shapes'][0]['points'][0]
-            x_max, y_max = data['shapes'][0]['points'][0]
+            x_max, y_max = data['shapes'][0]['points'][1]
             # print(x_min, y_min, x_max, y_max)
             object_name = data['shapes'][0]['label']
             # print(object_name)
@@ -96,9 +96,9 @@ def write_train_test_files(output_dir):
 
 
 if __name__ == "__main__":
-    # bbox_json_to_xml("SRTASK",
-    #                  input_dir="/home/weiyu/Research/labelme/labelme/examples/semantic_segmentation/custom_data/bbox/json",
-    #                  output_dir="/home/weiyu/Research/labelme/labelme/examples/semantic_segmentation/custom_data/bbox/xml")
+    bbox_json_to_xml("SRTASK",
+                     input_dir="/home/weiyu/Research/labelme/labelme/examples/semantic_segmentation/custom_data/bbox/json",
+                     output_dir="/home/weiyu/Research/labelme/labelme/examples/semantic_segmentation/custom_data/bbox/xml")
 
     # mask_npy_to_sm(input_dir="/home/weiyu/Research/labelme/labelme/examples/semantic_segmentation/custom_data/masks/SegmentationClass",
     #                output_dir="/home/weiyu/Research/labelme/labelme/examples/semantic_segmentation/custom_data/masks/SegmentationMask")
