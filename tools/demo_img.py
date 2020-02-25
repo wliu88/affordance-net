@@ -23,25 +23,15 @@ good_range = 0.005
 cwd = os.getcwd()
 root_path = os.path.abspath(os.path.join(cwd, os.pardir))  # get parent path
 print 'AffordanceNet root folder: ', root_path
-img_folder = cwd + '/img'
+img_folder = cwd + '/test_imgs'
 
-OBJ_CLASSES = ('__background__', 'bowl', 'tvm', 'pan', 'hammer', 'knife', 'cup', 'drill', 'racket', 'spatula', 'bottle')
+OBJ_CLASSES = ('_background_', 'scrubber', 'towelrolled', 'washingsponge', 'duster', 'featherduster')
 
 # Mask
 background = [200, 222, 250]  # background
-c1 = [0,0,205]                # contain
-c2 = [34,139,34] 	          # cut
-c3 = [192,192,128]            # display
-c4 = [165,42,42]    	 	  # engine
-c5 = [128,64,128]   		  # grasp
-c6 = [204,102,0]  			  # hit
-c7 = [184,134,11] 			  # pound
-c8 = [0,153,153] 			  # support
-c9 = [0,134,141]			  # w-grasp
-c10 = [184,0,141] 
-c11 = [184,134,0] 
-c12 = [184,134,223]
-label_colours = np.array([background, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12])
+c1 = [0,0,205]                # body
+c2 = [34,139,34] 	          # handle
+label_colours = np.array([background, c1, c2])
 
 # Object
 col0 = [0, 0, 0]
@@ -50,13 +40,42 @@ col2 = [255, 0, 255]
 col3 = [0, 125, 255]
 col4 = [55, 125, 0]
 col5 = [255, 50, 75]
-col6 = [100, 100, 50]
-col7 = [25, 234, 54]
-col8 = [156, 65, 15]
-col9 = [215, 25, 155]
-col10 = [25, 25, 155]
 
-col_map = [col0, col1, col2, col3, col4, col5, col6, col7, col8, col9, col10]
+col_map = [col0, col1, col2, col3, col4, col5]
+
+
+# OBJ_CLASSES = ('__background__', 'bowl', 'tvm', 'pan', 'hammer', 'knife', 'cup', 'drill', 'racket', 'spatula', 'bottle')
+#
+# # Mask
+# background = [200, 222, 250]  # background
+# c1 = [0,0,205]                # contain
+# c2 = [34,139,34] 	          # cut
+# c3 = [192,192,128]            # display
+# c4 = [165,42,42]    	 	  # engine
+# c5 = [128,64,128]   		  # grasp
+# c6 = [204,102,0]  			  # hit
+# c7 = [184,134,11] 			  # pound
+# c8 = [0,153,153] 			  # support
+# c9 = [0,134,141]			  # w-grasp
+# c10 = [184,0,141]
+# c11 = [184,134,0]
+# c12 = [184,134,223]
+# label_colours = np.array([background, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12])
+#
+# # Object
+# col0 = [0, 0, 0]
+# col1 = [0, 255, 255]
+# col2 = [255, 0, 255]
+# col3 = [0, 125, 255]
+# col4 = [55, 125, 0]
+# col5 = [255, 50, 75]
+# col6 = [100, 100, 50]
+# col7 = [25, 234, 54]
+# col8 = [156, 65, 15]
+# col9 = [215, 25, 155]
+# col10 = [25, 25, 155]
+#
+# col_map = [col0, col1, col2, col3, col4, col5, col6, col7, col8, col9, col10]
 
 
 
@@ -144,11 +163,13 @@ def draw_reg_text(img, obj_info):
 
 
 
-def visualize_mask(im, rois_final, rois_class_score, rois_class_ind, masks, ori_height, ori_width, im_name, thresh):
+def visualize_mask(image_name, im, rois_final, rois_class_score, rois_class_ind, masks, ori_height, ori_width, im_name, thresh):
 
     if rois_final.shape[0] == 0:
         print 'No detected box at all!'
         return
+
+    print(rois_class_score)
 
     inds = np.where(rois_class_score[:, -1] >= thresh)[0]
     if len(inds) == 0:
@@ -227,7 +248,7 @@ def visualize_mask(im, rois_final, rois_class_score, rois_class_ind, masks, ori_
             curr_mask = curr_mask.astype('uint8')
             color_curr_mask = label_colours.take(curr_mask, axis=0).astype('uint8')
             cv2.imshow('Mask' + str(i), color_curr_mask)
-            #cv2.imwrite('mask'+str(i)+'.jpg', color_curr_mask)
+            cv2.imwrite(image_name + 'mask'+str(i)+'.jpg', color_curr_mask)
 
 
     ori_file_path = img_folder + '/' + im_name 
@@ -237,14 +258,14 @@ def visualize_mask(im, rois_final, rois_class_score, rois_class_ind, masks, ori_
         img_out = draw_reg_text(img_org, ab)
     
     cv2.imshow('Obj detection', img_out)
-    #cv2.imwrite('obj_detction.jpg', img_out)
+    cv2.imwrite(image_name + '_detction.jpg', img_out)
     cv2.waitKey(0)
     
 
 
 def run_affordance_net(net, image_name):
 
-    im_file = img_folder + '/' + im_name
+    im_file = img_folder + '/' + image_name
     im = cv2.imread(im_file)
     
     ori_height, ori_width, _ = im.shape
@@ -261,7 +282,7 @@ def run_affordance_net(net, image_name):
            '{:d} object proposals').format(timer.total_time, rois_final.shape[0])
     
     # Visualize detections for each class
-    visualize_mask(im, rois_final, rois_class_score, rois_class_ind, masks, ori_height, ori_width, im_name, thresh=CONF_THRESHOLD)
+    visualize_mask(image_name, im, rois_final, rois_class_score, rois_class_ind, masks, ori_height, ori_width, im_name, thresh=CONF_THRESHOLD)
 
 
 def parse_args():
@@ -284,7 +305,9 @@ if __name__ == '__main__':
     
     
     prototxt = root_path + '/models/pascal_voc/VGG16/faster_rcnn_end2end/test.prototxt'
-    caffemodel = root_path + '/pretrained/AffordanceNet_200K.caffemodel'   
+    caffemodel = root_path + '/pretrained/vgg16_faster_rcnn_iter_12000.caffemodel'
+
+
     
     if not os.path.isfile(caffemodel):
         raise IOError(('{:s} not found.\n').format(caffemodel))
